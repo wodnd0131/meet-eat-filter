@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Restaurant } from '../types';
 import RestaurantCard from './RestaurantCard';
 import RestaurantMap from './RestaurantMap';
-import RestaurantPopup from './RestaurantPopup';
 import { getAvailableRestaurantsCount } from '../utils/filterUtils';
 import { Button } from './ui/button';
 import { List, X } from 'lucide-react';
@@ -16,8 +15,6 @@ interface MapResultsProps {
 const MapResults: React.FC<MapResultsProps> = ({ restaurants, onBack }) => {
   const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(null);
   const [showList, setShowList] = useState(false);
-  const [popupRestaurant, setPopupRestaurant] = useState<Restaurant | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
   
   const availableCount = getAvailableRestaurantsCount(restaurants);
   const availableRestaurants = restaurants.filter(r => !r.isFiltered);
@@ -26,30 +23,11 @@ const MapResults: React.FC<MapResultsProps> = ({ restaurants, onBack }) => {
     const restaurant = restaurants.find(r => r.id === restaurantId);
     if (restaurant && !restaurant.isFiltered) {
       setSelectedRestaurant(restaurantId);
-      setPopupRestaurant(restaurant);
-      setIsPopupOpen(true);
     }
   };
 
   const handleCardClick = (restaurantId: number) => {
     setSelectedRestaurant(restaurantId);
-  };
-
-  const handleShareRestaurant = (restaurant: Restaurant) => {
-    // 공유 기능 구현
-    const shareText = `${restaurant.name} - ${restaurant.category}\n평점: ${restaurant.rating}점\n가격: ${restaurant.priceRange}\n도보 ${restaurant.walkTime}분`;
-    
-    if (navigator.share) {
-      navigator.share({
-        title: `${restaurant.name} 추천`,
-        text: shareText,
-        url: window.location.href
-      });
-    } else {
-      navigator.clipboard.writeText(shareText);
-      alert('식당 정보가 클립보드에 복사되었습니다!');
-    }
-    setIsPopupOpen(false);
   };
 
   return (
@@ -145,16 +123,8 @@ const MapResults: React.FC<MapResultsProps> = ({ restaurants, onBack }) => {
         )}
       </div>
 
-      {/* 팝업 */}
-      <RestaurantPopup
-        restaurant={popupRestaurant}
-        isOpen={isPopupOpen}
-        onClose={() => setIsPopupOpen(false)}
-        onShare={handleShareRestaurant}
-      />
-
-      {/* 선택된 식당 정보 (기존 하단 바) */}
-      {selectedRestaurant && !isPopupOpen && (
+      {/* 선택된 식당 정보 */}
+      {selectedRestaurant && (
         <div className="bg-yellow-50 border-t-2 border-yellow-200 p-4">
           <div className="max-w-6xl mx-auto">
             <div className="flex items-center justify-between">
@@ -165,22 +135,10 @@ const MapResults: React.FC<MapResultsProps> = ({ restaurants, onBack }) => {
                     {restaurants.find(r => r.id === selectedRestaurant)?.name} 선택됨
                   </div>
                   <div className="text-sm text-gray-600">
-                    마커를 클릭하면 상세 정보를 볼 수 있어요!
+                    마커에 마우스를 올리면 상세 정보를 볼 수 있어요!
                   </div>
                 </div>
               </div>
-              <Button 
-                onClick={() => {
-                  const restaurant = restaurants.find(r => r.id === selectedRestaurant);
-                  if (restaurant) {
-                    setPopupRestaurant(restaurant);
-                    setIsPopupOpen(true);
-                  }
-                }}
-                className="bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold"
-              >
-                상세보기
-              </Button>
             </div>
           </div>
         </div>

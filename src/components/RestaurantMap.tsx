@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Restaurant } from '../types';
 
 interface RestaurantMapProps {
@@ -13,6 +13,8 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
   selectedRestaurant, 
   onMarkerClick 
 }) => {
+  const [hoveredRestaurant, setHoveredRestaurant] = useState<number | null>(null);
+  
   // 지도 중심점 (잠실역)
   const centerLat = 37.5142;
   const centerLng = 127.1031;
@@ -28,19 +30,19 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
     '치킨': { color: 'bg-amber-500', emoji: '🍗' }
   };
   
-  // 좌표를 픽셀 위치로 변환하는 함수 (마커 간격 넓힘)
+  // 좌표를 픽셀 위치로 변환하는 함수 (마커 간격 2.1배 증가)
   const coordsToPixels = (lat: number, lng: number, index: number) => {
-    const scale = 12000; // 확대 비율 증가
+    const scale = 25200; // 12000 * 2.1
     let x = (lng - centerLng) * scale + 200;
     let y = (centerLat - lat) * scale + 200;
     
-    // 마커가 겹치지 않도록 간격 조정 (5m 이상 = 약 15px 이상)
-    const gridSize = 25; // 최소 간격
+    // 마커가 겹치지 않도록 간격 조정 (2.1배 증가)
+    const gridSize = 52; // 25 * 2.1
     const offsetX = (index % 5) * gridSize;
     const offsetY = Math.floor(index / 5) * gridSize;
     
-    x += offsetX - 50; // 중심 조정
-    y += offsetY - 50;
+    x += offsetX - 105; // 중심 조정 (50 * 2.1)
+    y += offsetY - 105;
     
     return { x, y };
   };
@@ -77,19 +79,69 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
       {restaurants.map((restaurant, index) => {
         const { x, y } = coordsToPixels(restaurant.position.lat, restaurant.position.lng, index);
         const isSelected = selectedRestaurant === restaurant.id;
+        const isHovered = hoveredRestaurant === restaurant.id;
         const isFiltered = restaurant.isFiltered;
         const categoryStyle = categoryStyles[restaurant.category] || categoryStyles['한식'];
+        const showBubble = isHovered || isSelected;
         
         return (
           <div key={restaurant.id}>
+            {/* 말풍선 */}
+            {showBubble && !isFiltered && (
+              <div 
+                className="absolute z-20 bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-48 transform -translate-x-1/2"
+                style={{ left: `${x}px`, top: `${y - 80}px` }}
+              >
+                {/* 말풍선 화살표 */}
+                <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white"></div>
+                <div className="absolute bottom-[-9px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-9 border-r-9 border-t-9 border-l-transparent border-r-transparent border-t-gray-200"></div>
+                
+                {/* 말풍선 내용 */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">{categoryStyle.emoji}</span>
+                    <span className="font-bold text-gray-900">{restaurant.name}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <span>⭐</span>
+                      <span>{restaurant.rating}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>💰</span>
+                      <span>{restaurant.priceRange}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-xs text-gray-600">
+                    <div className="flex items-center gap-1">
+                      <span>🚶</span>
+                      <span>도보 {restaurant.walkTime}분</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span>🚗</span>
+                      <span>{restaurant.driveTime}분</span>
+                    </div>
+                  </div>
+                  
+                  <div className="text-xs text-green-600 font-medium">
+                    ✅ 모든 팀원 OK!
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* 마커 */}
             <button
               onClick={() => !isFiltered && onMarkerClick(restaurant.id)}
-              className={`absolute w-10 h-10 rounded-full border-3 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 transition-all flex items-center justify-center text-xl ${
+              onMouseEnter={() => !isFiltered && setHoveredRestaurant(restaurant.id)}
+              onMouseLeave={() => setHoveredRestaurant(null)}
+              className={`absolute w-10 h-10 rounded-full border-3 border-white shadow-lg transform -translate-x-1/2 -translate-y-1/2 transition-all flex items-center justify-center text-xl z-10 ${
                 isFiltered 
                   ? 'bg-gray-400 cursor-not-allowed opacity-50' 
-                  : isSelected
-                    ? `${categoryStyle.color} scale-125 z-10 ring-4 ring-yellow-300`
+                  : isSelected || isHovered
+                    ? `${categoryStyle.color} scale-125 ring-4 ring-yellow-300`
                     : `${categoryStyle.color} hover:scale-110 cursor-pointer hover:shadow-xl`
               }`}
               style={{ left: `${x}px`, top: `${y}px` }}
