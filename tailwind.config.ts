@@ -1,3 +1,4 @@
+import tailwindcssAnimate from "tailwindcss-animate";
 import type { Config } from "tailwindcss";
 
 export default {
@@ -84,13 +85,19 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+        'reveal': {
+          '0%': { transform: 'scale(0.8)', boxShadow: '0 0 0 0 rgba(255, 215, 0, 0.7)' },
+          '50%': { boxShadow: '0 0 0 10px rgba(255, 215, 0, 0)' },
+          '100%': { transform: 'scale(1)', boxShadow: 'none' },
+        }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+        'reveal': 'reveal 0.5s ease-out forwards',
 			}
 		}
 	},
-	plugins: [require("tailwindcss-animate")],
+	plugins: [tailwindcssAnimate],
 } satisfies Config;

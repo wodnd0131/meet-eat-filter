@@ -44,7 +44,7 @@ const PreferencesSurvey: React.FC<PreferencesSurveyProps> = ({ onComplete }) => 
         <div className="max-w-md mx-auto px-4 py-6">
           <div className="text-center">
             <div className="text-3xl mb-2">🍽️</div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-1">첫 미팅 맛집 찾기</h1>
+            <h1 className="text-2xl font-bold text-gray-900 mb-1">푸딩(fooding)</h1>
             <p className="text-gray-600">"모두가 만족할 점심 메뉴를 찾아보세요!"</p>
           </div>
         </div>

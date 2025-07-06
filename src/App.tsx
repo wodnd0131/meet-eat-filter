@@ -15,7 +15,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <BrowserRouter>
+      <BrowserRouter basename="/meet-eat-filter">
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/join-survey" element={<JoinSurvey />} />

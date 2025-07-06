@@ -13,6 +13,7 @@ export interface Restaurant {
   driveTime: number;
   isFiltered: boolean;
   filteredReason?: string;
+  filteredBy?: string[];
   tags: string[];
 }
 
