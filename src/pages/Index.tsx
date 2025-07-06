@@ -1,13 +1,38 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import PreferencesSurvey from '../components/PreferencesSurvey';
+import MapResults from '../components/MapResults';
+import { UserPreferences } from '../types';
+import { mockRestaurants } from '../data/restaurantData';
+import { filterRestaurants } from '../utils/filterUtils';
 
 const Index = () => {
+  const [currentStep, setCurrentStep] = useState<'survey' | 'results'>('survey');
+  const [filteredRestaurants, setFilteredRestaurants] = useState(mockRestaurants);
+
+  const handleSurveyComplete = (preferences: UserPreferences) => {
+    console.log('User preferences:', preferences);
+    const filtered = filterRestaurants(mockRestaurants, preferences);
+    console.log('Filtered restaurants:', filtered);
+    setFilteredRestaurants(filtered);
+    setCurrentStep('results');
+  };
+
+  const handleBackToSurvey = () => {
+    setCurrentStep('survey');
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {currentStep === 'survey' ? (
+        <PreferencesSurvey onComplete={handleSurveyComplete} />
+      ) : (
+        <MapResults 
+          restaurants={filteredRestaurants} 
+          onBack={handleBackToSurvey}
+        />
+      )}
+    </>
   );
 };
 
