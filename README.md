@@ -1,73 +1,92 @@
-# Welcome to your Lovable project
+# 첫미팅 몽이 페르소나 (소거법 방식)
 
-## Project info
+## 👤 페르소나 정보
 
-**URL**: https://lovable.dev/projects/5184112b-6ceb-4cbe-b258-1cb0cb6a26da
+- **이름**: 첫미팅 몽이
+- **나이**: 25세
+- **성별**: 남성
+- **직업**: 우테코 교육생
+- **상황**: 새로운 팀원들과의 첫 미팅에서 점심 식사 장소를 결정해야 하는 상황
 
-## How can I edit this code?
+## 🎯 목표 및 니즈
 
-There are several ways of editing your application.
+- **목표**: 모든 팀원이 만족할 수 있는 점심 식사 장소 선택으로 원활한 미팅 진행하기
+- **니즈**: 팀원들의 음식 취향과 제약사항을 빠르게 파악하고 합리적인 결정 내리기
+- **페인 포인트**:
+    - 팀원들의 취향을 모르는 상황에서의 결정 부담
+    - 의견 수렴 창구 부재로 인한 즉석 결정의 어려움
+    - 낯선 지역의 식당 정보 부족
 
-**Use Lovable**
+## 📖 사용자 시나리오
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5184112b-6ceb-4cbe-b258-1cb0cb6a26da) and start prompting.
+### **상황**
 
-Changes made via Lovable will be committed automatically to this repo.
+몽이는 우테코 첫 미팅에서 처음 만난 10명의 팀원들과 점심을 먹어야 한다. 모든 사람의 취향을 모르는 상황에서 어떤 메뉴를 제안할지 고민스럽고, 낯선 지역이라 주변 식당 정보도 전혀 모른다. 점심시간은 한정되어 있고, 모두가 만족할 수 있는 선택을 해야 한다는 부담감이 크다.
 
-**Use your preferred IDE**
+### **사용자 시나리오**:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+1. 몽이가 팀원들에게 음식 취향 조사 링크를 공유
+2. 팀원들이 각자 **못 먹는 음식, 싫어하는 음식, 회피하고 싶은 음식**을 간단히 선택
+3. 모든 팀원의 응답이 완료되면 현재 위치 기반으로 **선택 가능한 식당 목록** 제공 (소거법으로 필터링)
+4. 몽이가 제시된 3-5개의 안전한 선택지 중에서 **최종 결정**
+5. 결정 후 향후 팀 활동을 위해 **팀원 정보 저장 옵션** 제공
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### **사용자 스토리**
 
-Follow these steps:
+> "첫 미팅에서 점심 식사 장소를 정하게 된 상황에서, 저는 팀원들에게 개별적으로 취향을 묻지 않고도 아무도 거부하지 않을 식당 목록을 받고 싶습니다. 그래서 그 중에서 자신 있게 하나를 선택하여 모두가 편안한 식사 시간을 만들 수 있습니다."
+> 
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### **인수 조건**
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+- **Given**: 팀원들이 모두 취향 조사를 완료했을 때
+- **When**: 몽이가 추천 요청을 했을 때
+- **Then**: 모든 팀원의 제약사항을 고려하여 필터링된 3-5개의 식당 목록이 제공된다
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 💡 핵심 가치 제안
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+### 1. **즉석 의견 수렴**
 
-**Edit a file directly in GitHub**
+- 복잡한 회원가입 없이 링크 하나로 즉시 시작
+- 각자 개별적으로 응답하여 눈치 보지 않고 솔직한 의견 제출
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 2. **안전한 선택권 제공**
 
-**Use GitHub Codespaces**
+- 아무도 싫어하지 않는 **안전한 선택지들**만 필터링하여 제공
+- 3-5개의 적당한 옵션으로 선택 부담은 줄이면서 자율성은 보장
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 3. **결정 확신 증대**
 
-## What technologies are used for this project?
+- 이미 검증된 옵션들이므로 어떤 것을 선택해도 **실패 위험 없음**
+- 결정에 대한 자신감 향상
 
-This project is built with:
+### 4. **지속 가능한 활용**
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- 팀원 정보 저장으로 향후 모임에서 재활용 가능
+- 한 번의 설정으로 지속적인 편의성 제공
 
-## How can I deploy this project?
+## 🔧 핵심 기능 (프로토타입 범위)
 
-Simply open [Lovable](https://lovable.dev/projects/5184112b-6ceb-4cbe-b258-1cb0cb6a26da) and click on Share -> Publish.
+### **1단계: 취향 조사 (MVP)**
 
-## Can I connect a custom domain to my Lovable project?
+- 간단한 링크 공유로 팀원 초대
+- **제외 방식** 선택: 못 먹는 음식, 싫어하는 음식 체크
+- 실시간 응답 현황 확인
 
-Yes, you can!
+### **2단계: 소거법 필터링**
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- 모든 제약사항을 종합하여 **불가능한 식당들 제거**
+- 남은 식당 중 **3-5개의 검증된 선택지** 제공
+- 각 식당 정보 (위치, 메뉴, 가격대, 도보시간) 간단 표시
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### **3단계: 최종 선택 지원**
+
+- 제시된 옵션들 중 몽이가 **최종 1개 선택**
+- 선택 이유나 추가 정보 확인 가능
+- 결정 후 팀원들에게 결과 공유
+
+### **4단계: 선택적 확장**
+
+- 결정 후 팀원 정보 저장 여부 선택
+- 향후 모임을 위한 간단한 회원가입 유도
+
+## 🎨 사용자 경험 플로우
