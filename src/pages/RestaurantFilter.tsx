@@ -112,7 +112,7 @@ const RestaurantFilter = () => {
             <Button variant="ghost" onClick={goToNextTab} className="text-primary hover:bg-primary/10">
               건너뛰기 <SkipForward className="w-4 h-4 ml-2" />
             </Button>
-            <Button onClick={goToNextTab} disabled={currentTabIndex === categories.length - 1} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <Button onClick={goToNextTab} className="bg-primary text-primary-foreground hover:bg-primary/90">
               다음 <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </div>

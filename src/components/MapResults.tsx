@@ -143,7 +143,7 @@ const MapResults: React.FC = () => {
         <div className={`${showList ? 'lg:w-3/5' : 'w-full'} h-[500px] lg:h-auto transition-all duration-300`}>
           <div className="bg-white rounded-2xl p-4 shadow-sm h-full">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-gray-900">📍 잠실역 근처 맛집</h2>
+              <h2 className="text-lg font-bold text-gray-900">📍 강남역 근처 식당</h2>
               <div className="text-sm text-gray-600">
                 반경 500m 내 검색결과
               </div>
