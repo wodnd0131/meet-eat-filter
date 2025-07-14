@@ -8,22 +8,28 @@ export interface Restaurant {
     lng: number;
   };
   rating: number;
-  priceRange: string;
+  priceRange: number;
   walkTime: number;
-  driveTime: number;
   isFiltered: boolean;
   filteredReason?: string;
   filteredBy?: string[];
   tags: string[];
+  distance: number;
+  isOpen: '영업 중' | '영업 종료' | '브레이크 타임';
 }
 
-export interface UserPreferences {
-  cannotEat: string[];
-  dislike: string[];
+export interface Participant {
+  id: string;
+  name: string;
+  status: '대기중' | '선택완료';
 }
 
-export interface TeamStatus {
-  totalMembers: number;
-  respondedMembers: number;
+export interface Room {
+  id: string;
+  name: string;
   location: string;
+  radius: number;
+  participants: Participant[];
+  restaurants: Restaurant[];
+  status: 'waiting' | 'filtering' | 'finished';
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Restaurant } from '../types';
-import { mockRestaurants } from '../data/restaurantData'; // Import mock data
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ChevronDown } from 'lucide-react';
 
@@ -10,50 +9,23 @@ interface RestaurantMapProps {
   onMarkerClick: (restaurantId: number) => void;
 }
 
-// Helper function to generate mock restaurants around a center point
-const generateMockRestaurants = (centerLat: number, centerLng: number): Restaurant[] => {
-  // Add mock filteredBy data
-  const mockFilteredBy = [["Alice"], ["Bob"], ["Charlie"], ["David"], ["Eve"]];
-  return mockRestaurants.map((restaurant, index) => {
-    const angle = (index / mockRestaurants.length) * 2 * Math.PI;
-    const distance = 0.001 + Math.random() * 0.005; // 100m to 500m
-    const lat = centerLat + distance * Math.cos(angle);
-    const lng = centerLng + distance * Math.sin(angle) * 1.5; // Adjust for map projection
-
-    return {
-      ...restaurant,
-      position: { lat, lng },
-      filteredBy: restaurant.isFiltered ? mockFilteredBy[index % mockFilteredBy.length] : [],
-    };
-  });
-};
-
-const RestaurantMap: React.FC<RestaurantMapProps> = ({ 
-  selectedRestaurant, 
-  onMarkerClick 
+const RestaurantMap: React.FC<RestaurantMapProps> = ({
+  restaurants,
+  selectedRestaurant,
+  onMarkerClick
 }) => {
   const [hoveredRestaurant, setHoveredRestaurant] = useState<number | null>(null);
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
-  const [mapOffset, setMapOffset] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0 });
   const mapRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Mock user location for demonstration
-    setUserLocation({ lat: 37.5142, lng: 127.1031 }); // Default to Jamsil Station
+    setUserLocation({ lat: 37.4979, lng: 127.0276 }); // Default to Gangnam Station
   }, []);
 
-  const restaurants = useMemo(() => {
-    if (!userLocation) return [];
-    // Always return the generated restaurants in their original order.
-    // The selection styling is handled within the individual marker component.
-    return generateMockRestaurants(userLocation.lat, userLocation.lng);
-  }, [userLocation]);
-  
-  const centerLat = userLocation ? userLocation.lat : 37.5142;
-  const centerLng = userLocation ? userLocation.lng : 127.1031;
-  
+  const centerLat = userLocation ? userLocation.lat : 37.4979;
+  const centerLng = userLocation ? userLocation.lng : 127.0276;
+
   const categoryStyles: { [key: string]: { color: string; emoji: string } } = {
     '한식': { color: 'bg-red-500', emoji: '🍚' },
     '양식': { color: 'bg-yellow-500', emoji: '🍝' },
@@ -63,29 +35,18 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
     '패스트푸드': { color: 'bg-blue-500', emoji: '🍔' },
     '치킨': { color: 'bg-amber-500', emoji: '🍗' }
   };
-  
-  const coordsToPixelOffset = (lat: number, lng: number) => {
+
+  const coordsToPixelOffset = (lat: number, lng: number, index: number) => {
     const scale = 50000; // Increased scale for better marker spread
-    const dx = (lng - centerLng) * scale;
-    const dy = (centerLat - lat) * scale * 0.6; // Adjusted for aspect ratio
-    return { dx, dy };
-  };
+    const baseDx = (lng - centerLng) * scale;
+    const baseDy = (centerLat - lat) * scale * 0.6; // Adjusted for aspect ratio
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    dragStart.current = { x: e.clientX - mapOffset.x, y: e.clientY - mapOffset.y };
-  };
+    // Add a small, unique offset based on index to spread markers
+    const offsetMagnitude = 120; // Adjust this value to control spread distance
+    const offsetX = offsetMagnitude * Math.cos(index * 0.5); // Use index for unique angle
+    const offsetY = offsetMagnitude * Math.sin(index * 0.5); // Use index for unique angle
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging) return;
-    setMapOffset({
-      x: e.clientX - dragStart.current.x,
-      y: e.clientY - dragStart.current.y,
-    });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
+    return { dx: baseDx + offsetX, dy: baseDy + offsetY };
   };
 
   if (!userLocation) {
@@ -97,13 +58,9 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
   }
 
   return (
-    <div 
+    <div
       ref={mapRef}
-      className="relative w-full h-full bg-gradient-to-br from-green-100 to-blue-100 rounded-2xl overflow-hidden cursor-grab active:cursor-grabbing"
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp} // End drag if mouse leaves map area
+      className="relative w-full h-full bg-gradient-to-br from-green-100 to-blue-100 rounded-2xl overflow-hidden"
     >
       {/* 지도 배경 (단순화된 스케치 스타일) */}
       <div className="absolute inset-0 opacity-20">
@@ -130,20 +87,19 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
           <line x1="50%" y1="45%" x2="50%" y2="55%" stroke="#94a3b8" strokeWidth="1" />
         </svg>
       </div>
-      
-      <div 
+
+      <div
         className="absolute w-full h-full"
-        style={{ transform: `translate(${mapOffset.x}px, ${mapOffset.y}px)` }}
       >
         {/* 내 위치 마커 */}
-        <div 
+        <div
           className="absolute z-10 transform -translate-x-1/2 -translate-y-1/2"
           style={{ left: '50%', top: '50%' }}
         >
           <div className="w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md animate-ping-slow"></div>
           <div className="absolute top-0 left-0 w-5 h-5 bg-blue-500 rounded-full border-2 border-white shadow-md"></div>
         </div>
-        <div 
+        <div
           className="absolute text-sm font-bold text-blue-800 transform -translate-x-1/2"
           style={{ left: '50%', top: 'calc(50% + 20px)' }}
         >
@@ -153,20 +109,21 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
         {/* 선택된 식당으로의 경로 선 */}
         {selectedRestaurant && userLocation && (() => {
           const selectedRest = restaurants.find(r => r.id === selectedRestaurant);
-          if (selectedRest) {
-            const { dx, dy } = coordsToPixelOffset(selectedRest.position.lat, selectedRest.position.lng);
+          const selectedRestIndex = restaurants.findIndex(r => r.id === selectedRestaurant);
+          if (selectedRest && selectedRestIndex !== -1) {
+            const { dx, dy } = coordsToPixelOffset(selectedRest.position.lat, selectedRest.position.lng, selectedRestIndex);
             const userX = mapRef.current ? mapRef.current.offsetWidth / 2 : 0;
             const userY = mapRef.current ? mapRef.current.offsetHeight / 2 : 0;
-            
+
             return (
               <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <line 
-                  x1={userX - mapOffset.x} 
-                  y1={userY - mapOffset.y} 
-                  x2={userX + dx - mapOffset.x} 
-                  y2={userY + dy - mapOffset.y} 
-                  stroke="blue" 
-                  strokeWidth="2" 
+                <line
+                  x1={userX}
+                  y1={userY}
+                  x2={userX + dx}
+                  y2={userY + dy}
+                  stroke="blue"
+                  strokeWidth="2"
                   strokeDasharray="5 5"
                 />
               </svg>
@@ -174,28 +131,28 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
           }
           return null;
         })()}
-        
+
         {/* 식당 마커들 */}
-        {restaurants.map((restaurant) => {
-          const { dx, dy } = coordsToPixelOffset(restaurant.position.lat, restaurant.position.lng);
+        {restaurants.map((restaurant, index) => {
+          const { dx, dy } = coordsToPixelOffset(restaurant.position.lat, restaurant.position.lng, index);
           const isSelected = selectedRestaurant === restaurant.id;
           const isHovered = hoveredRestaurant === restaurant.id;
           const isFiltered = restaurant.isFiltered;
           const categoryStyle = categoryStyles[restaurant.category] || categoryStyles['한식'];
           const showBubble = isHovered || isSelected;
-          
+
           return (
-            <div 
+            <div
               key={restaurant.id}
               className="absolute transform -translate-x-1/2 -translate-y-1/2"
-              style={{ 
-                left: `calc(50% + ${dx}px)`, 
+              style={{
+                left: `calc(50% + ${dx}px)`,
                 top: `calc(50% + ${dy}px)`,
                 zIndex: isSelected || isHovered ? 30 : 20,
               }}
             >
               {showBubble && (
-                <div 
+                <div
                   className="absolute z-20 bg-white rounded-lg shadow-lg border border-gray-200 p-3 min-w-48 transform -translate-x-1/2 -translate-y-full -mt-4"
                 >
                   <div className="absolute bottom-[-8px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white"></div>
@@ -212,7 +169,7 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
                     </div>
                     {isFiltered ? (
                       <div className="text-xs text-red-600 font-medium">
-                        🚫 {restaurant.filteredReason} (선택: {restaurant.filteredBy?.join(', ')})
+                        🚫 선택: 머핀
                       </div>
                     ) : (
                       <div className="text-xs text-green-600 font-medium">✅ 모든 팀원 OK!</div>
@@ -220,7 +177,7 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
                   </div>
                 </div>
               )}
-              
+
               <button
                 onClick={() => onMarkerClick(restaurant.id)}
                 onMouseEnter={() => setHoveredRestaurant(restaurant.id)}
@@ -235,11 +192,11 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
               >
                 {isFiltered ? (isSelected ? categoryStyle.emoji : '❌') : categoryStyle.emoji}
               </button>
-              
-              <div 
+
+              <div
                 className={`absolute top-full left-1/2 transform -translate-x-1/2 mt-1 text-xs font-medium whitespace-nowrap px-2 py-1 rounded-md shadow-sm ${
-                  isFiltered 
-                    ? 'text-gray-500 bg-gray-100' 
+                  isFiltered
+                    ? 'text-gray-500 bg-gray-100'
                     : isSelected
                       ? 'text-yellow-800 bg-yellow-100 font-bold border border-yellow-300'
                       : 'text-white bg-black/70'
@@ -251,7 +208,7 @@ const RestaurantMap: React.FC<RestaurantMapProps> = ({
           );
         })}
       </div>
-      
+
       {/* 범례 (Collapsible) */}
       <Collapsible className="absolute bottom-4 left-4 bg-white rounded-lg p-3 shadow-lg max-w-xs z-40">
         <CollapsibleTrigger className="flex items-center justify-between w-full text-xs font-bold text-gray-800 mb-2">
