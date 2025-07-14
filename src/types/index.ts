@@ -11,6 +11,7 @@ export interface Restaurant {
   priceRange: number;
   walkTime: number;
   isFiltered: boolean;
+  isLiked: boolean;
   filteredReason?: string;
   filteredBy?: string[];
   tags: string[];

@@ -15,6 +15,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['고기', '회식'],
     distance: 450,
     isOpen: '영업 중',
+    isLiked: false,
   },
   {
     id: 2,
@@ -28,6 +29,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['간편식', '혼밥'],
     distance: 300,
     isOpen: '영업 중',
+    isLiked: false,
   },
   {
     id: 3,
@@ -56,6 +58,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['짜장면', '짬뽕', '탕수육'],
     distance: 350,
     isOpen: '영업 중',
+    isLiked: false,
   },
   {
     id: 5,
@@ -84,6 +87,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['초밥', '회전초밥'],
     distance: 280,
     isOpen: '영업 중',
+    isLiked: false,
   },
   {
     id: 7,
@@ -97,6 +101,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['카레', '돈까스'],
     distance: 550,
     isOpen: '영업 중',
+    isLiked: false,
   },
 
   // 양식
@@ -112,6 +117,7 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['햄버거', '감자튀김'],
     distance: 650,
     isOpen: '영업 중',
+    isLiked: false,
   },
   {
     id: 9,
@@ -140,5 +146,6 @@ export const mockRestaurants: Restaurant[] = [
     tags: ['샐러드', '건강식'],
     distance: 380,
     isOpen: '영업 중',
+    isLiked: false,
   },
 ];

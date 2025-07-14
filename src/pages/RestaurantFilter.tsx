@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, ArrowRight, SkipForward } from 'lucide-react';
+import { ArrowLeft, ArrowRight, SkipForward, Heart } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { mockRestaurants } from '@/data/mockRestaurantData';
 
@@ -40,6 +40,42 @@ const RestaurantFilter = () => {
       })
     );
   };
+
+  const handleToggleLikeRestaurant = (id: number) => {
+    setRestaurants(prev =>
+      prev.map(r =>
+        r.id === id ? { ...r, isLiked: !r.isLiked } : r
+      )
+    );
+  };
+
+  const handleToggleAllRestaurantsInTab = (category: string) => {
+    setRestaurants(prev => {
+      const restaurantsInTab = prev.filter(r => r.category === category);
+      const areAllFiltered = restaurantsInTab.every(r => r.isFiltered);
+
+      return prev.map(r => {
+        if (r.category === category) {
+          const newIsFiltered = !areAllFiltered;
+          let newFilteredBy = r.filteredBy ? [...r.filteredBy] : [];
+          if (newIsFiltered) {
+            if (!newFilteredBy.includes("머핀")) {
+              newFilteredBy.push("머핀");
+            }
+          } else {
+            newFilteredBy = newFilteredBy.filter(name => name !== "머핀");
+          }
+          return { ...r, isFiltered: newIsFiltered, filteredBy: newFilteredBy };
+        }
+        return r;
+      });
+    });
+  };
+
+  const areAllFilteredInCurrentTab = useMemo(() => {
+    const restaurantsInCurrentTab = restaurants.filter(r => r.category === activeTab);
+    return restaurantsInCurrentTab.length > 0 && restaurantsInCurrentTab.every(r => r.isFiltered);
+  }, [restaurants, activeTab]);
 
   const currentTabIndex = categories.findIndex(c => c.name === activeTab);
 
@@ -80,6 +116,16 @@ const RestaurantFilter = () => {
 
           {categories.map(cat => (
             <TabsContent key={cat.name} value={cat.name}>
+              <div className="flex justify-end mb-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => handleToggleAllRestaurantsInTab(cat.name)}
+                  className="text-primary border-primary hover:bg-primary/10"
+                >
+                  {areAllFilteredInCurrentTab ? '모두 포함' : '모두 제외'}
+                </Button>
+              </div>
               <div className="space-y-2 mt-4">
                 {restaurants
                   .filter(r => r.category === cat.name)
@@ -89,13 +135,18 @@ const RestaurantFilter = () => {
                       onClick={() => handleToggleRestaurant(r.id)}
                       className={`cursor-pointer transition-all duration-200 border-2 ${r.isFiltered ? 'border-dashed bg-muted/50 border-destructive' : 'bg-card border-secondary'}`}>
                       <CardContent className="flex justify-between items-center p-4">
-                        <div>
+                        <div className="flex-grow">
                           <p className={`font-semibold text-primary ${r.isFiltered ? 'line-through' : ''}`}>{r.name}</p>
                           <p className="text-sm text-muted-foreground">
                             도보 {r.walkTime}분 · {r.priceRange === 1 ? '₩' : r.priceRange === 2 ? '₩₩' : '₩₩₩'} · {r.isOpen}
                           </p>
                         </div>
-                        {r.isFiltered && <span className="text-2xl">❌</span>}
+                        <div className="flex items-center space-x-2">
+                          <Button variant="ghost" size="icon" onClick={(e) => { e.stopPropagation(); handleToggleLikeRestaurant(r.id); }}>
+                            <Heart className={`w-5 h-5 ${r.isLiked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`} />
+                          </Button>
+                          {r.isFiltered && <span className="text-2xl">❌</span>}
+                        </div>
                       </CardContent>
                     </Card>
                   ))}
